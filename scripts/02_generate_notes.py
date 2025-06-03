@@ -11,9 +11,8 @@ with open("assistant_id.txt") as f:
 with open("file_id.txt") as f:
     file_id = f.read().strip()
 
-user_input = "Explain the Rules for Limits of Functions at Infinity"
+user_input = "Generate 10 revision notes on key concepts in calculus, particularly focusing on limits, derivatives, integrals, and continuity."
 
-# create thread
 thread = client.beta.threads.create()
 
 message = client.beta.threads.messages.create(
@@ -39,7 +38,6 @@ if run.status == "completed":
                 if content.type == "text":
                     print(content.text.value)
 
-                    # Print citations
                     if content.text.annotations:
                         print("\n--- Citations ---")
                         for annotation in content.text.annotations:
