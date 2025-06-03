@@ -5,22 +5,33 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# Step 1: Upload the file
+file = client.files.create(
+    file=open("data/BasicCalculus.pdf", "rb"),
+    purpose="assistants"
+)
+
+# Step 2: Create assistant with file_search tool 
+# Let OpenAI handle vector store creation automatically
 assistant = client.beta.assistants.create(
     name="Study Q&A Assistant",
     instructions=(
-        "You are a helpful tutor. Use the knowledge in the attached files to answer questions. "
+        "You are a helpful tutor. "
+        "Use the knowledge in the attached files to answer questions. "
         "Cite sources where possible."
     ),
     model="gpt-4o-mini",
-    tools=[{"type": "file_search"}],
+    tools=[{"type": "file_search"}]
 )
 
-file_id = client.files.create(
-    purpose="knowledge_retrieval", file=open("data/BasicCalculus.pdf", "rb")
-).id
-client.assistants.update(
-    assistant.id, tool_resources={"file_search": {"vector_store_files": [file_id]}}
-)
-
+# Step 3: Create a thread and attach the file to the message instead
+# This is the approach that works with older library versions
 with open("assistant_id.txt", "w") as f:
     f.write(assistant.id)
+
+with open("file_id.txt", "w") as f:
+    f.write(file.id)
+
+print(f"Assistant created with ID: {assistant.id}")
+print(f"File uploaded with ID: {file.id}")
+print("Setup complete! The file will be attached per message in the Q&A script.")
