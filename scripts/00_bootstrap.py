@@ -1,6 +1,9 @@
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-client = OpenAI()
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 assistant = client.beta.assistants.create(
     name="Study Q&A Assistant",
@@ -18,3 +21,6 @@ file_id = client.files.create(
 client.assistants.update(
     assistant.id, tool_resources={"file_search": {"vector_store_files": [file_id]}}
 )
+
+with open("assistant_id.txt", "w") as f:
+    f.write(assistant.id)
